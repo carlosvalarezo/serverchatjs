@@ -18,14 +18,13 @@ const register = async (req, res) => {
     });
 
     user = new User({name, email, password, avatar});
-
     user.password = await bcrypt.hash(password, config.get('salt'));
 
     await user.save();
     return res.status(201).send({status:'user created'});
   }
   catch(err){
-    console.log(err.message);
+    console.log("aqui...", err);
     return res.status(500).send({status:err.message});
   }
 

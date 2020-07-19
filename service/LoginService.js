@@ -24,7 +24,7 @@ const login = async (req, res) => {
 
     jwt.sign(payload, config.get('jwtSecret'), {expiresIn:360000}, (err, token) => {
       if(err) throw err;
-      return res.status(201).send({status:'user logged', user});
+      return res.status(201).send({status:'user logged', token});
     });
   }
   catch(err){

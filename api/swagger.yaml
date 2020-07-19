@@ -63,7 +63,7 @@ paths:
         409:
           description: an existing user already exists
         500:
-          description: error 
+          description: error
       x-swagger-router-controller: "User"
   /login:
     post:
@@ -98,7 +98,7 @@ paths:
     get:
       tags:
       - "message"
-      summary: "retrieves message from db"
+      summary: "retrieves messages from db"
       description: "retrieves message from db"
       operationId: "getMessage"
       produces:
@@ -118,34 +118,23 @@ paths:
       - "message"
       summary: "adds a message to the db"
       description: "Adds a message to the db"
-      operationId: "addMessage"
+      operationId: "insert"
       consumes:
       - "application/json"
       produces:
       - "application/json"
       parameters:
-      - name: "owner"
-        in: "formData"
-        description: "owner of the message"
-        required: true
-        type: "string"
-      - name: "time"
-        in: "formData"
-        description: "Submission time of the message"
-        required: true
-        type: "string"
-        format: "date-time"
-      - name: "message"
-        in: "formData"
-        description: "the message"
-        required: true
-        type: "string"
+      - in: body
+        name: user
+        description: User to add
+        schema:
+          $ref: '#/definitions/Message'
       responses:
         "201":
           description: "message created"
         "400":
           description: "invalid input, object invalid"
-      x-swagger-router-controller: "Users"
+      x-swagger-router-controller: "Message"
 definitions:
   User:
     type: object
@@ -167,15 +156,11 @@ definitions:
   Message:
     type: "object"
     required:
-    - "source"
     - "time"
     - "owner"
     - "message"
     - "chatroom"
     properties:
-      source:
-        type: "string"
-        example: "Widget Adapter"
       time:
         type: "string"
         format: "date-time"
@@ -185,7 +170,7 @@ definitions:
         example: "this is a message"
       owner:
         type: "string"
-        example: "lorenz the cat"
+        example: "1234-5467-1234-1234"
       chatroom:
         type: "string"
         example: "my-chatroom"
