@@ -38,6 +38,33 @@ paths:
               status_code:
                 type: integer
                 example: 200
+  /user:
+    post:
+      tags:
+      - user
+      summary: adds a user
+      operationId: register
+      description: Adds a user to the db
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      parameters:
+      - in: body
+        name: user
+        description: User to add
+        schema:
+          $ref: '#/definitions/User'
+      responses:
+        201:
+          description: user created
+        400:
+          description: invalid input, object invalid
+        409:
+          description: an existing user already exists
+        500:
+          description: error 
+      x-swagger-router-controller: "User"
   /login:
     post:
       tags:
@@ -46,25 +73,26 @@ paths:
       description: "validates email/password and logs in"
       operationId: "login"
       consumes:
-      - "application/json"
+        - application/x-www-form-urlencoded
       produces:
-      - "application/json"
+      - application/json
       parameters:
-      - name: "email"
-        in: "formData"
-        description: "email of the user"
-        required: true
-        type: "string"
-      - name: "password"
-        in: "formData"
-        description: "password of the user"
-        required: true
-        type: "string"
+        - in: formData
+          name: email
+          type: string
+          description: A user's email.
+          required: true
+        - in: formData
+          name: password
+          type: string
+          format: password
+          description: A person's password.
+          required: true
       responses:
-        "201":
+        201:
           description: "user logged in"
-        "400":
-          description: "invalid input, object invalid"
+        403:
+          description: "wrong credentials!"
       x-swagger-router-controller: "login"
   /message:
     get:
@@ -119,6 +147,23 @@ paths:
           description: "invalid input, object invalid"
       x-swagger-router-controller: "Users"
 definitions:
+  User:
+    type: object
+    required:
+      - name
+      - email
+      - password
+    properties:
+      name:
+        type: "string"
+        example: "my name"
+      email:
+        type: "string"
+        example: "email@email.com"
+      password:
+        type: "string"
+        format: "password"
+        example: "my password"
   Message:
     type: "object"
     required:
