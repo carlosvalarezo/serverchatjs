@@ -1,0 +1,119 @@
+---
+swagger: "2.0"
+info:
+  description: "This is the chat API"
+  version: "1.0.0"
+  title: "Chat API"
+  contact:
+    email: "carlos.valarezo@gmail.com"
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+host: "localhost:3000"
+tags:
+- name: "users"
+  description: "send messages"
+schemes:
+- "https"
+- "http"
+paths:
+  /health:
+    get:
+      tags:
+      - "health endpoint"
+      summary: "checks the app is up & running"
+      description: "checks the app is up & running"
+      operationId: "health"
+      produces:
+      - "application/json"
+      x-swagger-router-controller: "Health"
+      responses:
+        "200":
+          description: "the app is ok"
+          schema:
+            type: "object"
+            properties:
+              status:
+                type: string
+                example: "ok"
+              status_code:
+                type: integer
+                example: 200
+  /message:
+    get:
+      tags:
+      - "message"
+      summary: "retrieves message from db"
+      description: "retrieves message from db"
+      operationId: "getMessage"
+      produces:
+      - "application/json"
+      responses:
+        "200":
+          description: "return the messages from db"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Message"
+        "400":
+          description: "bad input parameter"
+      x-swagger-router-controller: "Users"
+    post:
+      tags:
+      - "message"
+      summary: "adds a message to the db"
+      description: "Adds a message to the db"
+      operationId: "addMessage"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "owner"
+        in: "formData"
+        description: "owner of the message"
+        required: true
+        type: "string"
+      - name: "time"
+        in: "formData"
+        description: "Submission time of the message"
+        required: true
+        type: "string"
+        format: "date-time"
+      - name: "message"
+        in: "formData"
+        description: "the message"
+        required: true
+        type: "string"
+      responses:
+        "201":
+          description: "message created"
+        "400":
+          description: "invalid input, object invalid"
+      x-swagger-router-controller: "Users"
+definitions:
+  Message:
+    type: "object"
+    required:
+    - "source"
+    - "time"
+    - "owner"
+    - "message"
+    - "chatroom"
+    properties:
+      source:
+        type: "string"
+        example: "Widget Adapter"
+      time:
+        type: "string"
+        format: "date-time"
+        example: "2016-08-29T09:12:33.001Z"
+      message:
+        type: "string"
+        example: "this is a message"
+      owner:
+        type: "string"
+        example: "lorenz the cat"
+      chatroom:
+        type: "string"
+        example: "my-chatroom"
