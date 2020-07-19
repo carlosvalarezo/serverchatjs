@@ -9,13 +9,12 @@ info:
   license:
     name: "Apache 2.0"
     url: "http://www.apache.org/licenses/LICENSE-2.0.html"
-host: "localhost:3000"
+host: "localhost:8443"
 tags:
 - name: "users"
   description: "send messages"
 schemes:
 - "https"
-- "http"
 paths:
   /health:
     get:
@@ -39,6 +38,34 @@ paths:
               status_code:
                 type: integer
                 example: 200
+  /login:
+    post:
+      tags:
+      - "login"
+      summary: "logins the user in"
+      description: "validates email/password and logs in"
+      operationId: "login"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "email"
+        in: "formData"
+        description: "email of the user"
+        required: true
+        type: "string"
+      - name: "password"
+        in: "formData"
+        description: "password of the user"
+        required: true
+        type: "string"
+      responses:
+        "201":
+          description: "user logged in"
+        "400":
+          description: "invalid input, object invalid"
+      x-swagger-router-controller: "login"
   /message:
     get:
       tags:

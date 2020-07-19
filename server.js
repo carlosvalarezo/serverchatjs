@@ -6,11 +6,17 @@ const swaggerTools = require('swagger-tools');
 const jsyaml = require('js-yaml');
 const express = require('express');
 
-const PORT = process.env.PORT || 3000;
+const https = require('https');
+const privateKey  = fs.readFileSync('sslcert/server.key', 'utf8');
+const certificate = fs.readFileSync('sslcert/server.cert', 'utf8');
+
+const credentials = {key: privateKey, cert: certificate};
+
 
 const healthRoute = require('./routes/health');
 
 const app = express();
+const PORT = process.env.PORT || 8443;
 
 app.use('/health', healthRoute);
 
@@ -32,6 +38,9 @@ swaggerTools.initializeMiddleware(swaggerDoc, function (middleware) {
 
 });
 
-app.listen(PORT, () => console.log(`Server running in port ${PORT}`));
+// app.listen(PORT, () => console.log(`Server running in port ${PORT}`));
+const httpsServer = https.createServer(credentials, app);
+
+httpsServer.listen(8443);
 
 app.disable('etag');
