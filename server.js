@@ -16,7 +16,6 @@ const credentials = {key: privateKey, cert: certificate};
 const healthRoute = require('./routes/health');
 const userRoute = require('./routes/user');
 const loginRoute = require('./routes/login');
-const authRoute = require('./routes/auth');
 const messageRoute = require('./routes/message');
 
 const PORT = process.env.PORT || 8443;
@@ -30,8 +29,8 @@ app.use(express.urlencoded({extended: false}));
 app.use('/health', healthRoute);
 app.use('/user', userRoute);
 app.use('/login', loginRoute);
-app.use('/auth', authRoute);
 app.use('/message', messageRoute);
+
 // The Swagger document (require it, build it programmatically, fetch it from a URL, ...)
 const spec = fs.readFileSync(path.join(__dirname,'api/swagger.yaml'), 'utf8');
 const swaggerDoc = jsyaml.safeLoad(spec);
