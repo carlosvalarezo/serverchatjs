@@ -22,10 +22,9 @@ const insert = async (req, res) => {
     if (message.search("/stock=") >= 0){
       const code = message.split("=")[1];
       const stooqResponse = await axios.get(`https://stooq.com/q/l/?s=${code}&f=sd2t2ohlcv&h&e=csv`);
-        const {data} = stooqResponse;
-      console.log(data);
+      const {data} = stooqResponse;
       csv({output: "json"}).fromString(data).then(row=>{
-        MQSender.send('hello', row);
+        MQSender.send('chat', row);
       });
     }
     return res.status(201).json({status:'message created'});
@@ -38,7 +37,7 @@ const insert = async (req, res) => {
 
 const get = async (req, res) => {
   try{
-    let msgs = await Message.find();
+    const msgs = await Message.find();
     return res.status(201).json({status:msgs});
   }
   catch(err){
@@ -49,13 +48,12 @@ const get = async (req, res) => {
 
 const bot = async (req, res) => {
   try{
-    await MQConsumer.receive('hello', (x) => {console.log(JSON.stringify(x.content.toString()))});
-    return res.status(200).json({a:'a'});
-
+    const rabbit = await MQConsumer.receive('chat');
+    return res.status(201).json(rabbit);
   }
   catch(err){
     console.log(err);
-    return res.status(500).json({status:err.message});
+    return res.status(500).json({status:err});
   }
 };
 
