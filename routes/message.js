@@ -6,4 +6,5 @@ const MessageController = require('../controllers/Message');
 
 router.post('/', auth, MessageController.insert);
 router.get('/', auth, MessageController.get);
+router.get('/bot', auth, MessageController.bot);
 module.exports = router;
