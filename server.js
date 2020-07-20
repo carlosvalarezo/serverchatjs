@@ -30,7 +30,6 @@ app.use('/health', healthRoute);
 app.use('/user', userRoute);
 app.use('/login', loginRoute);
 app.use('/message', messageRoute);
-app.use('/message/bot', messageRoute);
 
 // The Swagger document (require it, build it programmatically, fetch it from a URL, ...)
 const spec = fs.readFileSync(path.join(__dirname,'api/swagger.yaml'), 'utf8');

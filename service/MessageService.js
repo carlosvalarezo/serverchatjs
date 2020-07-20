@@ -8,8 +8,9 @@ const csv = require('csvtojson');
 const Message = require('../models/Message');
 const User = require('../models/User');
 
-const MQSender = require('../lib/rabbit/MQSender');
 const MQConsumer = require('../lib/rabbit/MQConsumer');
+const MQSender = require('../lib/rabbit/MQSender');
+
 
 const insert = async (req, res) => {
   const {id} = req.user;
@@ -23,8 +24,9 @@ const insert = async (req, res) => {
       const code = message.split("=")[1];
       const stooqResponse = await axios.get(`https://stooq.com/q/l/?s=${code}&f=sd2t2ohlcv&h&e=csv`);
       const {data} = stooqResponse;
+      console.log(data);
       csv({output: "json"}).fromString(data).then(row=>{
-        MQSender.send('chat', row);
+        MQSender.send('chat-chat-bot', row);
       });
     }
     return res.status(201).json({status:'message created'});
@@ -46,15 +48,4 @@ const get = async (req, res) => {
   }
 };
 
-const bot = async (req, res) => {
-  try{
-    const rabbit = await MQConsumer.receive('chat');
-    return res.status(201).json(rabbit);
-  }
-  catch(err){
-    console.log(err);
-    return res.status(500).json({status:err});
-  }
-};
-
-module.exports = { insert, get, bot };
+module.exports = { insert, get };

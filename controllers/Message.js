@@ -10,8 +10,4 @@ const get = (req, res) => {
   Message.get(req, res);
 }
 
-const bot = (req, res) => {
-  Message.bot(req, res);
-}
-
-module.exports = {insert, get, bot};
+module.exports = {insert, get};
