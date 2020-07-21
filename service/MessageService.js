@@ -15,12 +15,8 @@ const insert = async (req, res) => {
   const {message, chatroom, source} = req.body;
 
   try{
-    let msg = await Message.findOne({owner:id});
-    msg = new Message({owner:id, message, chatroom, source:'db'});
-    await msg.save();
-    const jwt = req.header('x-auth-token');
-    QueueSender.send('mongo-queue', {status:"new", jwt});
-    insertRabbit(message);
+    sendMongo(id, message, chatroom);
+    sendRabbit(message);
     return res.status(201).json({status:'message created'});
   }
   catch(err){
@@ -40,7 +36,7 @@ const get = async (req, res) => {
   }
 };
 
-const insertRabbit = async message => {
+const sendRabbit = async message => {
   if (message.search("/stock=") >= 0){
     const code = message.split("=")[1];
     const stooqResponse = await axios.get(`https://stooq.com/q/l/?s=${code}&f=sd2t2ohlcv&h&e=csv`);
@@ -49,6 +45,15 @@ const insertRabbit = async message => {
       QueueSender.send('chat-queue',{status:`${row[0].Symbol} quote is \$${row[0].Close}`});
     });
   }
+}
+
+const sendMongo = async (userId, message, chatroom) => {
+  let msg = await Message.findOne({owner:userId});
+  msg = new Message({owner:userId, message, chatroom, source:'db'});
+  const lateMessage = await msg.save();
+  const {id} = lateMessage;
+  const latestMessage = await Message.findById(id).populate({path:'owner', select:'name avatar'});
+  QueueSender.send('mongo-queue', {status:latestMessage});
 }
 
 module.exports = { insert, get };
