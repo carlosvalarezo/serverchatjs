@@ -28,22 +28,13 @@ app.use('/user', userRoute);
 app.use('/login', loginRoute);
 app.use('/message', messageRoute);
 
-// The Swagger document (require it, build it programmatically, fetch it from a URL, ...)
 const spec = fs.readFileSync(path.join(__dirname,'api/swagger.yaml'), 'utf8');
 const swaggerDoc = jsyaml.safeLoad(spec);
 
-// Initialize the Swagger middleware
 swaggerTools.initializeMiddleware(swaggerDoc, function (middleware) {
-
-  // Interpret Swagger resources and attach metadata to request - must be first in swagger-tools middleware chain
   app.use(middleware.swaggerMetadata());
-
-  // Validate Swagger requests
   app.use(middleware.swaggerValidator());
-
-  // Serve the Swagger documents and Swagger UI
   app.use(middleware.swaggerUi());
-
 });
 
 app.disable('etag');
