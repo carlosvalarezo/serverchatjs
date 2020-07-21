@@ -8,9 +8,7 @@ const csv = require('csvtojson');
 const Message = require('../models/Message');
 const User = require('../models/User');
 
-const MQSender = require('../lib/rabbit/MQSender');
-const MongoSender = require('../lib/rabbit/MongoSender');
-
+const QueueSender = require('../lib/rabbit/QueueSender');
 
 const insert = async (req, res) => {
   const {id} = req.user;
@@ -20,17 +18,9 @@ const insert = async (req, res) => {
     let msg = await Message.findOne({owner:id});
     msg = new Message({owner:id, message, chatroom, source:'db'});
     await msg.save();
-    MongoSender('mongo-queue', "new");
-
-    if (message.search("/stock=") >= 0){
-      const code = message.split("=")[1];
-      const stooqResponse = await axios.get(`https://stooq.com/q/l/?s=${code}&f=sd2t2ohlcv&h&e=csv`);
-      const {data} = stooqResponse;
-      console.log(data);
-      csv({output: "json"}).fromString(data).then(row=>{
-        MQSender.send('chat-chat-bot', `${row[0].Symbol} quote is \$${row[0].Close}`);
-      });
-    }
+    const jwt = req.header('x-auth-token');
+    QueueSender.send('mongo-queue', {status:"new", jwt});
+    insertRabbit(message);
     return res.status(201).json({status:'message created'});
   }
   catch(err){
@@ -42,7 +32,6 @@ const insert = async (req, res) => {
 const get = async (req, res) => {
   try{
     const msgs = await Message.find().populate({path:'owner', select:'name avatar'});
-    console.log(msgs);
     return res.status(201).json({status:msgs});
   }
   catch(err){
@@ -50,5 +39,16 @@ const get = async (req, res) => {
     return res.status(500).json({status:err.message});
   }
 };
+
+const insertRabbit = async message => {
+  if (message.search("/stock=") >= 0){
+    const code = message.split("=")[1];
+    const stooqResponse = await axios.get(`https://stooq.com/q/l/?s=${code}&f=sd2t2ohlcv&h&e=csv`);
+    const {data} = stooqResponse;
+    csv({output: "json"}).fromString(data).then(row=>{
+      QueueSender.send('chat-queue',{status:`${row[0].Symbol} quote is \$${row[0].Close}`});
+    });
+  }
+}
 
 module.exports = { insert, get };

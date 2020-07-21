@@ -6,15 +6,12 @@ const swaggerTools = require('swagger-tools');
 const jsyaml = require('js-yaml');
 const express = require('express');
 const connectDB = require('./config/db');
-const https = require('https');
-const privateKey  = fs.readFileSync('./sslcert/server.key', 'utf8');
-const certificate = fs.readFileSync('./sslcert/server.cert', 'utf8');
-const credentials = {key: privateKey, cert: certificate};
+const http = require('http');
 
-const PORT = process.env.PORT || 8443;
+const PORT = process.env.PORT || 3000;
 
 const app = express();
-const httpsServer = https.createServer(credentials, app).listen(PORT);
+const httpServer = http.createServer(app).listen(PORT);
 
 const healthRoute = require('./routes/health');
 const userRoute = require('./routes/user');
