@@ -6,52 +6,22 @@ const swaggerTools = require('swagger-tools');
 const jsyaml = require('js-yaml');
 const express = require('express');
 const connectDB = require('./config/db');
+const https = require('https');
+const privateKey  = fs.readFileSync('./sslcert/server.key', 'utf8');
+const certificate = fs.readFileSync('./sslcert/server.cert', 'utf8');
+const credentials = {key: privateKey, cert: certificate};
 
-const http = require('http');
-const privateKey  = fs.readFileSync('sslcert/server.key', 'utf8');
-const certificate = fs.readFileSync('sslcert/server.cert', 'utf8');
+const PORT = process.env.PORT || 8443;
 
-const credentials = {key: privateKey, cert: certificate, requestCert: false,
-    rejectUnauthorized: false};
+const app = express();
+const httpsServer = https.createServer(credentials, app).listen(PORT);
 
 const healthRoute = require('./routes/health');
 const userRoute = require('./routes/user');
 const loginRoute = require('./routes/login');
 const messageRoute = require('./routes/message');
 
-
-const PORT = process.env.PORT || 3000;
-
 connectDB();
-const app = express();
-const httpServer = http.createServer(app);
-const io = require("socket.io"),
-      server = io.listen(httpServer);
-
-    let
-        sequenceNumberByClient = new Map();
-
-    // event fired every time a new client connects:
-    server.on("connection", (socket) => {
-        console.info(`Client connected [id=${socket.id}]`);
-        // initialize this client's sequence number
-        sequenceNumberByClient.set(socket, 1);
-
-        // when socket disconnects, remove it from the list:
-        socket.on("disconnect", () => {
-            sequenceNumberByClient.delete(socket);
-            console.info(`Client gone [id=${socket.id}]`);
-        });
-    });
-
-    // sends each client its current sequence number
-    setInterval(() => {
-        for (const [client, sequenceNumber] of sequenceNumberByClient.entries()) {
-            client.emit("seq-num", sequenceNumber);
-            sequenceNumberByClient.set(client, sequenceNumber + 1);
-        }
-    }, 1000);
-
 
 app.use(express.json({extended: false}));
 app.use(express.urlencoded({extended: false}));
@@ -78,7 +48,5 @@ swaggerTools.initializeMiddleware(swaggerDoc, function (middleware) {
   app.use(middleware.swaggerUi());
 
 });
-
-httpServer.listen(PORT);
 
 app.disable('etag');

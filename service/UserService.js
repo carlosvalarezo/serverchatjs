@@ -24,7 +24,6 @@ const register = async (req, res) => {
     return res.status(201).send({status:'user created'});
   }
   catch(err){
-    console.log("aqui...", err);
     return res.status(500).send({status:err.message});
   }
 
