@@ -8,7 +8,11 @@ const connectDB = async () => {
     let connection = null;
     while(connection === null){
       console.log(`mongodb should connect to ${db}`);
-      connection = await mongoose.connect(db, options);
+      connection = await mongoose.connect(db, options, err => {
+          if(err){
+            setTimeout(connectWithRetry, 1500);
+          }
+      });
     }
     console.log('mongodb connected...');
   }
