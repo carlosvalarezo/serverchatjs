@@ -77,17 +77,11 @@ paths:
       produces:
       - application/json
       parameters:
-        - in: formData
-          name: email
-          type: string
-          description: A user's email.
-          required: true
-        - in: formData
-          name: password
-          type: string
-          format: password
-          description: A person's password.
-          required: true
+        - in: body
+          name: login
+          description: login
+          schema:
+            $ref: '#/definitions/Login'
       responses:
         201:
           description: "user logged in"
@@ -136,6 +130,19 @@ paths:
           description: "invalid input, object invalid"
       x-swagger-router-controller: "Message"
 definitions:
+  Login:
+    type: object
+    required:
+      - email
+      - password
+    properties:
+      email:
+        type: "string"
+        example: "email@email.com"
+      password:
+        type: "string"
+        format: "password"
+        example: "my password"
   User:
     type: object
     required:

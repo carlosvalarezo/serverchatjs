@@ -8,7 +8,8 @@ const express = require('express');
 const connectDB = require('./config/db');
 const http = require('http');
 
-const PORT = process.env.PORT || 3000;
+
+const PORT = process.env.PORT || 8001;
 
 const app = express();
 const httpServer = http.createServer(app).listen(PORT);
@@ -20,8 +21,17 @@ const messageRoute = require('./routes/message');
 
 connectDB();
 
+app.use((req, res, next) => {
+  res.header('Content-Type','application/json');
+  res.header('Access-Control-Allow-Origin','*');
+  res.header('Access-Control-Allow-Methods','GET,PUT,POST,DELETE');
+  res.header('Access-Control-Allow-Headers','*');
+  next();
+});
+
 app.use(express.json({extended: false}));
 app.use(express.urlencoded({extended: false}));
+
 
 app.use('/health', healthRoute);
 app.use('/user', userRoute);

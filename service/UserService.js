@@ -29,4 +29,12 @@ const register = async (req, res) => {
 
 };
 
-module.exports = { register };
+const getUserByName = async name => {
+  return await User.find({name}).select("id name avatar");
+}
+
+const getUserById = async id => {
+  return await User.findById(id).select("id name avatar");
+}
+
+module.exports = { register, getUserByName,  getUserById };

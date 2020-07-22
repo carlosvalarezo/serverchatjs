@@ -11,8 +11,9 @@ const login = async (req, res) => {
   let {password} = req.body;
   try{
     password = await bcrypt.hash(password, config.get('salt'));
-    const user = await User.findOne({email, password});
-    if(!user){
+    const user = await User.find({email, password});
+    console.log({user});
+    if(user.length <= 0){
       return res.status(403).send({status:'wrong credentials!'});
     }
 
