@@ -5,15 +5,16 @@ const db = process.env.DEPLOY ? config.get('mongoREMOTE') : config.get('mongoLOC
 const connectDB = async () => {
   const options = { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true};
   try{
-    let connection = null;
-    while(connection === null){
-      console.log(`mongodb should connect to ${db}`);
-      connection = await mongoose.connect(db, options, err => {
-          if(err){
-            setTimeout(connectWithRetry, 1500);
-          }
-      });
-    }
+
+    const connectWithRetry = function() {
+        return mongoose.connect(db, function(err) {
+            if (err) {
+                console.error('Failed to connect to mongo on startup - retrying in 1 sec', err);
+                setTimeout(connectWithRetry, 1500);
+            }
+        });
+    };
+    connectWithRetry();
     console.log('mongodb connected...');
   }
   catch(err){
