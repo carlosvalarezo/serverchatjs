@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const config = require('config');
-const db = config.get('mongoURI');
+const db = process.env.DEPLOY ? config.get('mongoREMOTE') : config.get("mongoLOCAL");
 
 const connectDB = async () => {
   const options = { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true};
