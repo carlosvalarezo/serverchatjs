@@ -5,8 +5,11 @@ const db = process.env.DEPLOY ? config.get('mongoREMOTE') : config.get('mongoLOC
 const connectDB = async () => {
   const options = { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true};
   try{
-    console.log(`mongodb should connect to ${db}`);
-    await mongoose.connect(db, options);
+    let connection = null;
+    while(connection === null){
+      console.log(`mongodb should connect to ${db}`);
+      connection = await mongoose.connect(db, options);
+    }
     console.log('mongodb connected...');
   }
   catch(err){
