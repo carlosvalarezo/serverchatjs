@@ -1,6 +1,6 @@
 {
   "mongoLOCAL": "mongodb://localhost:27017/chat",
-  "mongoREMOTE":"mongodb://mongo:27017/chat",
+  "mongoREMOTE": "mongodb://mongo:27017/chat",
   "jwtSecret": "mysecret",
   "salt": "$2a$10$EUAgzYoHUaZDlMk06Fcene"
 }
