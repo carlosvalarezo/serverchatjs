@@ -10,14 +10,12 @@ const UserService = require('../service/UserService');
 const QueueSender = require('../lib/rabbit/QueueSender');
 
 const insert = async (req, res) => {
-  const {id} = req.user;
-  const {message, chatroom, source} = req.body;
+  const {message, chatroom, source, user} = req.body;
   try{
-    const user = await UserService.getUserById(id);
-    sendMongo(user, message, chatroom);
+    sendMongo(user[0], message, chatroom);
     const rabbitMessge = await sendRabbit(message);
     const bot = await UserService.getUserByName("Bot");
-    sendMongo(bot[0].id, rabbitMessge, chatroom)
+    sendMongo(bot[0], rabbitMessge, chatroom)
     return res.status(201).json({status:'message created'});
   }
   catch(err){
@@ -51,8 +49,8 @@ const sendRabbit = async message => {
 
 }
 
-const sendMongo = async (userId, message, chatroom) => {
-  const msg = new Message({owner:userId, message, chatroom, source:'db'});
+const sendMongo = async (user, message, chatroom) => {
+  const msg = new Message({owner:user, message, chatroom, source:'db'});
   const lateMessage = await msg.save();
   const {id} = lateMessage;
   const latestMessage = await Message.findById(id).populate({path:'owner', select:'name avatar'});

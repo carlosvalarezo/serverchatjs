@@ -11,17 +11,12 @@ const login = async (req, res) => {
   let {password} = req.body;
   try{
     password = await bcrypt.hash(password, config.get('salt'));
-    const user = await User.find({email, password});
-    console.log({user});
+    const user = await User.find({email, password}).select("id name email avatar");
     if(user.length <= 0){
       return res.status(403).send({status:'wrong credentials!'});
     }
 
-    const payload = {
-      user:{
-        id: user.id
-      }
-    }
+    const payload = {user}
 
     jwt.sign(payload, config.get('jwtSecret'), {expiresIn:360000}, (err, token) => {
       if(err) throw err;
